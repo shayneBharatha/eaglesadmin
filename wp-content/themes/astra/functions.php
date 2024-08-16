@@ -187,43 +187,52 @@ function enqueue_select2() {
 }
 add_action('wp_enqueue_scripts', 'enqueue_select2');
 
-function create_custom_user_registration_table() {
+// Register additional user info table creation on theme activation
+function create_additional_user_info_table() {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'user_registration_details'; // Custom table name
+    $table_name = $wpdb->prefix . 'additional_user_info';
+
     $charset_collate = $wpdb->get_charset_collate();
 
     $sql = "CREATE TABLE $table_name (
-        id BIGINT(20) NOT NULL AUTO_INCREMENT,
-        user_id BIGINT(20) NOT NULL,
-        member_id VARCHAR(50),
-        first_name VARCHAR(100),
-        other_names VARCHAR(100),
-        last_name VARCHAR(100),
-        email VARCHAR(100),
-        address TEXT,
-        contact_number VARCHAR(50),
-        occupation VARCHAR(100),
-        institute VARCHAR(100),
-        date_of_birth DATE,
-        nic VARCHAR(50),
-        height FLOAT,
-        weight FLOAT,
-        bmi FLOAT,
-        registered_date DATE,
-        emergency_contact_number VARCHAR(50),
-        emergency_contact_name VARCHAR(100),
-        emergency_contact_relationship VARCHAR(50),
-        guidance ENUM('required', 'no need', 'need a little'),
-        how_did_you_know ENUM('posters', 'banners', 'leaflets', 'facebook', 'instagram', 'by a friend', 'other'),
-        other_info TEXT,
-        PRIMARY KEY (id),
-        FOREIGN KEY (user_id) REFERENCES {$wpdb->users}(ID) ON DELETE CASCADE
+        id BIGINT(20) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT(20) UNSIGNED NOT NULL,
+        first_name VARCHAR(255) DEFAULT '',
+        other_names VARCHAR(255) DEFAULT '',
+        last_name VARCHAR(255) DEFAULT '',
+        address TEXT DEFAULT '',
+        contact_number VARCHAR(50) DEFAULT '',
+        occupation VARCHAR(255) DEFAULT '',
+        institute VARCHAR(255) DEFAULT '',
+        date_of_birth DATE DEFAULT NULL,
+        nic VARCHAR(255) DEFAULT '',
+        height FLOAT DEFAULT NULL,
+        weight FLOAT DEFAULT NULL,
+        bmi FLOAT DEFAULT NULL,
+        registered_date DATE DEFAULT NULL,
+        emergency_contact_number VARCHAR(50) DEFAULT '',
+        emergency_contact_name VARCHAR(255) DEFAULT '',
+        emergency_contact_relationship VARCHAR(255) DEFAULT '',
+        guidance VARCHAR(255) DEFAULT '',
+        how_heard VARCHAR(255) DEFAULT '',
+        other_info TEXT DEFAULT '',
+        UNIQUE KEY user_id (user_id)
     ) $charset_collate;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
 }
-add_action('init', 'create_custom_user_registration_table');
+add_action('after_switch_theme', 'create_additional_user_info_table');
+
+// Save user meta when a new user is created
+function save_additional_user_info($user_id) {
+    // Example of saving additional user info; adapt as needed
+    if (isset($_POST['first_name'])) {
+        update_user_meta($user_id, 'first_name', sanitize_text_field($_POST['first_name']));
+        // Add other fields here
+    }
+}
+add_action('user_register', 'save_additional_user_info');
 
 
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-filters.php';
