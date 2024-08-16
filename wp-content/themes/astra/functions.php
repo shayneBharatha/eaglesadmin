@@ -11,16 +11,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
-/**
- * My codes from here...
- */
-
-
-
-/* 
- * to here..
- * */
-
 
 /**
  * Define Constants
@@ -190,9 +180,56 @@ require_once ASTRA_THEME_DIR . 'inc/core/markup/class-astra-markup.php';
 /**
  * Load deprecated functions
  */
+
+function enqueue_select2() {
+    wp_enqueue_style('select2-css', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css');
+    wp_enqueue_script('select2-js', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array('jquery'), null, true);
+}
+add_action('wp_enqueue_scripts', 'enqueue_select2');
+
+function create_custom_user_registration_table() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'user_registration_details'; // Custom table name
+    $charset_collate = $wpdb->get_charset_collate();
+
+    $sql = "CREATE TABLE $table_name (
+        id BIGINT(20) NOT NULL AUTO_INCREMENT,
+        user_id BIGINT(20) NOT NULL,
+        member_id VARCHAR(50),
+        first_name VARCHAR(100),
+        other_names VARCHAR(100),
+        last_name VARCHAR(100),
+        email VARCHAR(100),
+        address TEXT,
+        contact_number VARCHAR(50),
+        occupation VARCHAR(100),
+        institute VARCHAR(100),
+        date_of_birth DATE,
+        nic VARCHAR(50),
+        height FLOAT,
+        weight FLOAT,
+        bmi FLOAT,
+        registered_date DATE,
+        emergency_contact_number VARCHAR(50),
+        emergency_contact_name VARCHAR(100),
+        emergency_contact_relationship VARCHAR(50),
+        guidance ENUM('required', 'no need', 'need a little'),
+        how_did_you_know ENUM('posters', 'banners', 'leaflets', 'facebook', 'instagram', 'by a friend', 'other'),
+        other_info TEXT,
+        PRIMARY KEY (id),
+        FOREIGN KEY (user_id) REFERENCES {$wpdb->users}(ID) ON DELETE CASCADE
+    ) $charset_collate;";
+
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+}
+add_action('init', 'create_custom_user_registration_table');
+
+
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-filters.php';
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-hooks.php';
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-functions.php';
+
 
 
 

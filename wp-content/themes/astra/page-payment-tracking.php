@@ -6,7 +6,7 @@ get_header(); ?>
 <div id="primary" class="content-area">
     <main id="main" class="site-main" role="main">
 
-        <h1>Track Payment</h1>
+        <h1>Mark Payment</h1>
 
         <form method="post" action="">
             <?php
@@ -28,14 +28,16 @@ get_header(); ?>
             <label for="date">Date:</label>
             <input type="date" name="date" id="date" value="<?php echo date('Y-m-d'); ?>" required>
 
+            <label>Type:</label>
+            <br><label><input type="radio" name="payment_type" value="new_reg" id="new_reg" required> New Registration</label>
+            <br><label><input type="radio" name="payment_type" value="monthly_fee" id="monthly_fee"> Monthly Fee</label>
+            <br><label><input type="radio" name="payment_type" value="day_fee" id="day_fee"> Day Fee</label>
+
+
             <label for="amount">Amount:</label>
             <input type="number" name="amount" id="amount" step="0.01" required>
 
-            <label>Type:</label>
-            <label><input type="radio" name="payment_type" value="new_reg" required> New Registration</label>
-            <label><input type="radio" name="payment_type" value="monthly_fee"> Monthly Fee</label>
-            <label><input type="radio" name="payment_type" value="day_fee"> Day Fee</label>
-
+            
             <input type="submit" name="submit_payment" value="Submit">
         </form>
 
@@ -78,5 +80,39 @@ get_header(); ?>
 
     </main><!-- #main -->
 </div><!-- #primary -->
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    // Define default amounts for each payment type
+    var defaultAmounts = {
+        'new_reg': 2800.00,     // Replace with your desired amount
+        'monthly_fee': 1900.00,  // Replace with your desired amount
+        'day_fee': 250.00       // Replace with your desired amount
+    };
+
+    // Function to set the amount field based on selected payment type
+    function updateAmount() {
+        var selectedType = $('input[name="payment_type"]:checked').val();
+        var amount = defaultAmounts[selectedType] || '';
+        $('#amount').val(amount);
+    }
+
+    // Attach the updateAmount function to radio button change event
+    $('input[name="payment_type"]').on('change', updateAmount);
+
+    // Optional: Set default amount on page load if a radio button is already selected
+    updateAmount();
+});
+</script>
+
+
+<script>
+jQuery(document).ready(function($) {
+    $('#member').select2({
+        placeholder: 'Select a member',
+        allowClear: true
+    });
+});
+</script>
 
 <?php get_footer(); ?>
